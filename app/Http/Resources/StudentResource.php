@@ -15,7 +15,8 @@ class StudentResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'class' => ClassResource::make($this->whenLoaded('class')),
-            'section' => SectionResource::make($this->whenLoaded('section'))
+            'section' => SectionResource::make($this->whenLoaded('section')),
+            'created_at' => $this->created_at->toFormattedDateString(),
         ];
     }
 }

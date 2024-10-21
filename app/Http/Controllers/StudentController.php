@@ -8,9 +8,10 @@ use App\Http\Resources\StudentResource;
 
 class StudentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $students = StudentResource::collection(Student::all());
+
+        $students = StudentResource::collection(Student::paginate(10));
         return inertia('Students/Index', [
             'students' => $students
         ]);
