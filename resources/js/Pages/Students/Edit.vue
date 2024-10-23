@@ -1,14 +1,14 @@
 
 <template>
-    <Head title="Create Student" />
+    <Head title="Update Student" />
     <AuthenticatedLayout>
     <template #header>
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Create Student</h2>
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Update Student</h2>
     </template>
         <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
             <div class="lg:grid lg:grid-cols-12 lg:gap-x-5">
                 <div class="space-y-6 sm:px-6 lg:px-0 lg:col-span-12">
-                    <form @submit.prevent="createStudent">
+                    <form @submit.prevent="updateStudent">
                         <div class="shadow sm:rounded-md sm:overflow-hidden">
                             <div class="bg-white py-6 px-4 space-y-6 sm:p-6">
                                 <div>
@@ -16,7 +16,7 @@
                                         Student Information
                                     </h3>
                                     <p class="mt-1 text-sm text-gray-500">
-                                        Use this form to create a new student.
+                                        Use this form to update student.
                                     </p>
                                 </div>
 
@@ -71,7 +71,7 @@
                                 </Link>
                                 <button type="submit"
                                     class="bg-indigo-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    Save
+                                    Update
                                 </button>
                             </div>
                         </div>
@@ -84,8 +84,8 @@
 
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
-import { watch, ref } from 'vue';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { watch, ref, onMounted } from 'vue';
 import axios from 'axios';
 import InputError from '@/Components/InputError.vue';
 
@@ -93,16 +93,21 @@ defineProps({
     classes: {
         type: Object,
         required: true,
+    },
+    student: {
+        type: Object,
+        required: true,
     }
 })
 
 let sections = ref({})
+let student = usePage().props.student.data
 
 const form = useForm({
-    name: "",
-    email: "",
-    class_id: "",
-    section_id: "",
+    name: student.name,
+    email: student.email,
+    class_id: student.class.id,
+    section_id: student.section.id,
 })
 
 const getSections = (classId) => {
@@ -114,10 +119,14 @@ const getSections = (classId) => {
 
 watch(() => form.class_id, (newValue) => {
     getSections(newValue)
+    form.section_id = ""
 })
 
-const createStudent = () => {
-    form.post(route('students.store'))
+const updateStudent = () => {
+    form.put(route('students.update', student.id))
 }
 
+onMounted(() => {
+    getSections(form.class_id)
+})
 </script>
