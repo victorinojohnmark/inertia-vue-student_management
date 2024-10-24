@@ -16,11 +16,24 @@ class StudentController extends Controller
 {
     public function index(Request $request)
     {
+        $studentQuery = Student::query();
 
-        $students = StudentResource::collection(Student::paginate(10));
+        $this->applySearch($studentQuery, $request->search);
+
+        $students = StudentResource::collection(
+            $studentQuery->paginate(10) 
+        );
         return inertia('Students/Index', [
-            'students' => $students
+            'students' => $students,
+            'search' => $request->search ?? ''
         ]);
+    }
+
+    protected function applySearch($query, $search)
+    {
+        return $query->when($search, function($query, $search) {
+            $query->where('name', 'like', '%'.$search.'%');
+        });
     }
 
     public function show(Student $student)

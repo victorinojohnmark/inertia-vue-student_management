@@ -58,16 +58,20 @@ defineProps({
     data: {
         type: Object,
         required: true,
+    }, 
+    updatePageNumber: {
+        type: Function,
+        required: true,
     }
 })
 
 console.log(usePage().props.students)
 
-const updatePageNumber = (link) => {
-    let pageNumber = link.url.split("=")[1];
+// const updatePageNumber = (link) => {
+//     let pageNumber = link.url.split("=")[1];
 
-    router.visit(`/students?page=${pageNumber}`, {
-        preserveScroll: true
-    })
-}
+//     router.visit(`/students?page=${pageNumber}`, {
+//         preserveScroll: true
+//     })
+// }
 </script>

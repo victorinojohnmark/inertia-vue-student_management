@@ -33,7 +33,7 @@
                                     <MagnifyingGlass />
                                 </div>
 
-                                <input type="text" autocomplete="off" placeholder="Search students data..." id="search"
+                                <input type="text" v-model="search" autocomplete="off" placeholder="Search students data..." id="search"
                                     class="block rounded-lg border-0 py-2 pl-10 text-gray-900 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
                             </div>
                         </div>
@@ -87,7 +87,7 @@
                                             </tbody>
                                         </table>
                                     </div>
-                                    <Pagination :data="students" />
+                                    <Pagination :data="students" :updatePageNumber="updatedPageNumber" />
                                 </div>
                             </div>
                         </div>
@@ -103,14 +103,55 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import MagnifyingGlass from "@/Components/Icons/MagnifyingGlass.vue";
 import Pagination from "@/Components/Pagination.vue";
-import { Head, usePage, Link, useForm } from '@inertiajs/vue3';
+import { Head, usePage, Link, useForm, router } from '@inertiajs/vue3';
+import { computed, ref, watch } from "vue";
 
 defineProps({
     students: {
         type: Object,
         required: true
+    },
+    search: {
+        type: String,
+        required: true
     }
 })
+
+let search = ref(usePage().props.search), pageNumber = ref(1);
+let timeout = null;
+let studentsUrl = computed(() => {
+    let url =  new URL(route('students.index'));
+    url.searchParams.append("page", pageNumber.value);
+
+    if(search.value) {
+        url.searchParams.set('search', search.value);
+    }
+
+    return url;
+})
+
+const updatedPageNumber = (link) => {
+    // console.log(link.url);
+    pageNumber.value = link.url.split('=')[1];
+}
+
+watch(() => studentsUrl.value, (updatedStudentUrl) => {
+    if(timeout) clearTimeout(timeout)
+    timeout = setTimeout(() => {
+        router.visit(updatedStudentUrl, {
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        })
+    }, 1500)
+})
+
+watch(() => search.value, (value) => {
+    if(value) {
+        pageNumber.value = 1;
+    }
+})
+
 const deleteForm = useForm({});
 
 const deleteStudent = (studentId) => {
