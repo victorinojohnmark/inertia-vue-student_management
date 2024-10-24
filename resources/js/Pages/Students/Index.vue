@@ -79,7 +79,7 @@
                                                         <Link :href="route('students.edit', student.id)" class="text-indigo-600 hover:text-indigo-900">
                                                             Edit
                                                         </Link>
-                                                        <button class="ml-2 text-indigo-600 hover:text-indigo-900">
+                                                        <button @click="deleteStudent(student.id)" class="ml-2 text-indigo-600 hover:text-indigo-900">
                                                             Delete
                                                         </button>
                                                     </td>
@@ -103,7 +103,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import MagnifyingGlass from "@/Components/Icons/MagnifyingGlass.vue";
 import Pagination from "@/Components/Pagination.vue";
-import { Head, usePage, Link } from '@inertiajs/vue3';
+import { Head, usePage, Link, useForm } from '@inertiajs/vue3';
 
 defineProps({
     students: {
@@ -111,5 +111,16 @@ defineProps({
         required: true
     }
 })
+const deleteForm = useForm({});
+
+const deleteStudent = (studentId) => {
+    if(confirm("Are you sure you want to delete this student?")) {
+        deleteForm.delete(route('students.destroy', studentId), {
+            preserveScroll: true,
+        })
+        
+    }
+    
+}
 
 </script>
